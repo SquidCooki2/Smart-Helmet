@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Turn Signal</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  #arrow {
+    position: fixed; inset: 0; display: none;
+    align-items: center; justify-content: center;
+    color: #ffa000; font-size: 90vmin; line-height: 1;
+    font-family: Arial, sans-serif;
+    animation: flash 0.8s steps(1) infinite;
+  }
+  #arrow.on { display: flex; }
+  @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0; } }
+</style>
+</head>
+<body>
+<div id="arrow"></div>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+  const arrow = document.getElementById('arrow');
+  const socket = io();
+  function show(sym) { arrow.textContent = sym; arrow.classList.add('on'); }
+  socket.on('signal_left',  () => show('\u2B05'));
+  socket.on('signal_right', () => show('\u27A1'));
+  socket.on('signal_off',   () => arrow.classList.remove('on'));
+  document.body.addEventListener('click', () => {
+    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+  });
+</script>
+</body>
+</html>
