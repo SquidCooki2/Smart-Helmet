@@ -28,8 +28,10 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1      # if blocked: Set-ExecutionPolicy -Scope Process Bypass
 pip install -r laptop_vision\requirements.txt
 ```
-- Place pothole weights at `laptop_vision/models/pothole.pt` (required; see `models/README.md`).
-- `yolov8n.pt` downloads automatically on first run if absent.
+- Download weights: `python laptop_vision\download_models.py` (pothole model from Hugging Face `cazzz307/Pothole-Finetuned-YoloV8` plus base YOLOv8n).
+- Run the logic tests: `python -m unittest discover tests`.
+- Thresholds and ports are in `laptop_vision/config.py`.
+- Optional on the Pi: install autostart units from `pi_edge/systemd/` (copy to `/etc/systemd/system/`, `sudo systemctl enable --now helmet-camera helmet-audio`; adjust paths/user).
 - Use a Python version supported by mediapipe/torch (3.12 is fine).
 
 ## 1. Start order
@@ -64,7 +66,7 @@ curl.exe -X POST http://localhost:8080/set_signal/right
 curl.exe -X POST http://localhost:8080/set_signal/off
 ```
 The phone should flash an amber arrow, then go black on `off`.
-Note: the page loads the Socket.IO client from a CDN, so the phone needs internet access (backlog T-008).
+The Socket.IO client is served locally, so no internet is needed on the phone.
 
 ### Step 4: Main pipeline (Laptop, terminal 2)
 ```powershell
@@ -83,8 +85,8 @@ An "Smart Helmet AR Dashboard" window opens: front cam (left) and rear cam (righ
 
 ## 3. Troubleshooting
 - **Black/empty panel in dashboard:** the stream isn't reachable. Open the stream URL in a browser; check the Pi IP and that both devices are on the same network.
-- **`pothole.pt` not found:** add the weights file (see above).
-- **Phone shows nothing:** check the laptop IP, firewall on port 8080, and phone internet (CDN script).
+- **`pothole.pt` not found:** run `python laptop_vision\download_models.py`.
+- **Phone shows nothing:** check the laptop IP and firewall on port 8080.
 - **No sound:** verify the Bluetooth speaker is connected and default (`aplay alarm.wav` directly on the Pi).
 - **Camera errors on the Pi:** run `rpicam-hello --list-cameras`; the streamer uses camera indices 0 (front) and 1 (rear). Swap them in `camera_streamer.py` if reversed.
 - **Left/right mirrored:** adjust the logic in `main_pipeline.py` (backlog T-006).

@@ -1,0 +1,14 @@
+[Unit]
+Description=Smart Helmet camera streamer
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/smart-helmet/pi_edge
+ExecStart=/usr/bin/python3 camera_streamer.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

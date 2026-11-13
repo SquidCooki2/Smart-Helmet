@@ -1,4 +1,6 @@
 # Models
 
-- `yolov8n.pt` – auto-downloaded by Ultralytics on first run if missing (or download from the Ultralytics releases).
-- `pothole.pt` – **place your pre-trained pothole YOLOv8 weights here** (not included).
+- `pothole.pt` – [cazzz307/Pothole-Finetuned-YoloV8](https://huggingface.co/cazzz307/Pothole-Finetuned-YoloV8) (`Yolov8-fintuned-on-potholes.pt`).
+- `yolov8n.pt` – base COCO YOLOv8 nano from Ultralytics.
+
+Both are fetched by `python laptop_vision/download_models.py` (weights are git-ignored).
