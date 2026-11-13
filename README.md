@@ -1,25 +1,38 @@
-# Smart Helmet CV System
+# Smart Helmet Module (Phase 1 PoC)
 
-A computer-vision smart helmet for cyclists: a Raspberry Pi 5 streams two cameras, a laptop runs YOLOv8 + MediaPipe, and a phone on the back of the helmet shows turn signals.
+An aftermarket, detachable smart helmet module combining asymmetric sensor fusion (mmWave radar-triggered CSI camera AI), IMU crash detection with automated SOS, and hands-free audio alerts.
 
-| Node | Role | Code |
-|---|---|---|
-| Raspberry Pi 5 | MJPEG camera streams (:5000), alarm audio (:5001) | [pi_edge/](pi_edge) |
-| Laptop | Vision pipeline, AR dashboard, phone display server (:8080) | [laptop_vision/](laptop_vision) |
-| Smartphone | Full-screen amber turn-signal page | browser → `http://<LAPTOP_IP>:8080` |
+See [Product Development Plan](doc/smart_helmet_module_product_plan.md) for the full product vision and [Software PoC Plan](doc/smart_helmet_software_poc_plan.md) for the Phase 1 Raspberry Pi Zero 2 W architecture.
 
-## Quick start
+## Repository Layout
+
+| Path | Purpose |
+|---|---|
+| [poc/config.py](poc/config.py) | Thresholds, hardware ports/bus addresses, and model paths |
+| [poc/radar_watchman.py](poc/radar_watchman.py) | UART mmWave radar reader and collision threat trigger |
+| [poc/camera_classifier.py](poc/camera_classifier.py) | Dormant CSI camera burst capture + TFLite MobileNet vehicle classifier |
+| [poc/crash_detect.py](poc/crash_detect.py) | 6-axis I2C IMU G-force spike + stillness crash detector |
+| [poc/alert_manager.py](poc/alert_manager.py) | Bluetooth TTS collision warnings and 15s cancellable SOS webhook |
+| [poc/main_controller.py](poc/main_controller.py) | `asyncio` orchestrator + `--mock` simulation runner |
+| [tests/test_poc.py](tests/test_poc.py) | Unit and integration tests |
+
+## Quick Start (Simulation / Dev Machine)
+
 ```powershell
 python -m venv .venv; .venv\Scripts\Activate.ps1
-pip install -r laptop_vision\requirements.txt
-python laptop_vision\download_models.py      # pothole + base YOLO weights
-python -m unittest discover tests            # logic tests
+pip install -r requirements.txt
+python -m unittest discover -s tests -v
+python -m poc.main_controller --mock --scenario mixed --duration 4 --sos-countdown 1
 ```
-Then follow [doc/RUNNING.md](doc/RUNNING.md) for the full multi-device run order.
+
+## Raspberry Pi Zero 2 W (Hardware Mode)
+
+```bash
+pip install -r requirements-pi.txt
+python -m poc.main_controller
+```
 
 ## Docs
-- [Specification](doc/master_repository_specification.md)
-- [Running everything](doc/RUNNING.md)
+- [Product Development Plan](doc/smart_helmet_module_product_plan.md)
+- [Software PoC Plan](doc/smart_helmet_software_poc_plan.md)
 - [Backlog](doc/backlog.md) · [Contributing (agents)](doc/CONTRIBUTING_AGENTS.md)
-
-Settings (IPs, thresholds) live in [laptop_vision/config.py](laptop_vision/config.py).

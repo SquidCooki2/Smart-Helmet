@@ -4,32 +4,26 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done. Priority: P0 (bloc
 Add new items per [CONTRIBUTING_AGENTS.md](CONTRIBUTING_AGENTS.md).
 
 ## Done
-- [x] Pi camera streamer (`pi_edge/camera_streamer.py`)
-- [x] Pi audio server (`pi_edge/audio_server.py`)
-- [x] Phone display server + UI (`laptop_vision/web_display/`)
-- [x] Laptop pipeline (`laptop_vision/main_pipeline.py`)
-- [x] `requirements.txt`, alarm generator script (`pi_edge/make_alarm.py`)
-- [x] T-001 Python 3.12 installed; `pi_edge/alarm.wav` generated
-- [~] T-002 Pothole weights: `laptop_vision/download_models.py` targets gated repo [cazzz307/Pothole-Finetuned-YoloV8](https://huggingface.co/cazzz307/Pothole-Finetuned-YoloV8); download blocked until access is granted (see T-002b)
-- [x] T-008 Socket.IO client bundled locally (`web_display/static/`); T-009 partial: added screen wake lock to phone page
-- [x] T-010 Top-level `README.md`
-- [x] T-011 systemd units in `pi_edge/systemd/`
-- [x] T-012 Logic refactored into `laptop_vision/logic.py`; 5 unit tests in `tests/` pass
-- [x] T-013 Settings moved to `laptop_vision/config.py`
-- [x] T-014 (partial) pothole model runs every N frames (`POTHOLE_EVERY_N`); GPU via `YOLO_DEVICE` env var
+- [x] T-001 Phase 1 PoC project scaffolding (`poc/config.py`, `requirements.txt`, `requirements-pi.txt`, `README.md`)
+- [x] T-002 Radar watchman module (`poc/radar_watchman.py`) with UART parser, threat thresholds (<50m, >15 mph), and cooldown
+- [x] T-003 Camera classifier module (`poc/camera_classifier.py`) with dormant burst capture, latency check (<200ms), and TFLite MobileNet mapping (`Car`, `Truck`, `Motorcycle`, `Unknown`)
+- [x] T-004 Crash detector module (`poc/crash_detect.py`) with 6-axis I2C IMU reader, >6G impact + stillness state machine, and `SOS_PROTOCOL` trigger
+- [x] T-005 Alert manager (`poc/alert_manager.py`) with Bluetooth TTS collision alerts and 15s cancellable SOS webhook
+- [x] T-006 Central `asyncio` orchestrator (`poc/main_controller.py`) with `--mock` simulation mode and 10 passing unit/integration tests (`tests/test_poc.py`)
 
 ## Backlog
 
 | ID | Pri | Status | Task | Owner |
 |----|-----|--------|------|-------|
-| T-003 | P0 | [~] | Deps installed in `.venv`, `main_pipeline` imports, `yolov8n.pt` loads, `mp.solutions` OK (mediapipe pinned to 0.10.21). Remaining: full run needs `pothole.pt` + live Pi streams | agent |
-| T-002b | P0 | [ ] | `pothole.pt` download blocked: HF repo `cazzz307/Pothole-Finetuned-YoloV8` is gated. Owner must request access, log in (`HF_TOKEN`), run `laptop_vision/download_models.py` | user |
-| T-004 | P0 | [ ] | Test on real Pi 5: both cameras stream at `/front` and `/rear`; confirm camera indices 0/1 (needs hardware) | unassigned |
-| T-005 | P1 | [ ] | Verify Bluetooth speaker pairing and `aplay` output on the Pi (needs hardware) | unassigned |
-| T-006 | P1 | [ ] | Tune arm-extension thresholds (`config.py`) with real footage; check left/right mirroring | unassigned |
-| T-007 | P1 | [ ] | Tune rear collision growth threshold/window with real vehicle footage | unassigned |
-| T-009 | P1 | [ ] | Test phone display end to end on a real phone (fullscreen, wake lock, reconnect) | unassigned |
-| T-015 | P2 | [ ] | Install systemd units on the Pi (`pi_edge/systemd/`) and verify autostart | unassigned |
+| T-007 | P0 | [ ] | Verify raw UART parsing against the physical mmWave radar sensor on Raspberry Pi Zero 2 W (`poc/radar_watchman.py`) | unassigned |
+| T-008 | P0 | [ ] | Verify 6-axis I2C IMU (`0x68`) raw reads and G-force calibration on Raspberry Pi Zero 2 W (`poc/crash_detect.py`) | unassigned |
+| T-009 | P0 | [ ] | Source/place quantized MobileNet `.tflite` + `labels.txt` in `models/` and benchmark <200ms radar-to-camera trigger latency on Pi Zero 2 W (`poc/camera_classifier.py`) | unassigned |
+| T-010 | P1 | [ ] | Configure Bluetooth headset audio sink on Pi OS Lite and verify `espeak` / TTS collision and SOS countdown playback (`poc/alert_manager.py`) | unassigned |
+| T-011 | P1 | [ ] | Add passive loop-recording dashcam buffer to local SD card in `poc/camera_classifier.py` per product plan | unassigned |
+| T-012 | P1 | [ ] | Conduct controlled parking-lot ride tests to tune `crash_g_threshold`, `radar_max_distance_m`, and `radar_danger_speed_mph` in `poc/config.py` | unassigned |
+| T-013 | P2 | [ ] | Add BLE peripheral / companion app stub and handlebar turn-signal RF/ANT+ sync prototype per product plan | unassigned |
+| T-014 | P2 | [ ] | Phase 2 ergonomics: 3D-print 100g/130g/160g "Spider" dummy mounts and run helmet balance ride tests | unassigned |
 
 ## Notes / Known limitations
-- Hardware-dependent items cannot be done without the Pi, cameras, speaker and phone.
+- Hardware-dependent items (T-007 through T-010, T-012) cannot be verified without the Raspberry Pi Zero 2 W, CSI camera, mmWave radar, I2C IMU, and Bluetooth headset.
+- Current `tests/test_poc.py` and `--mock` mode validate orchestration, state machines, and interfaces using simulated sensor feeds.

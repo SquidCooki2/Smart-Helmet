@@ -1,8 +1,0 @@
-opencv-python<4.12
-numpy<2
-ultralytics
-mediapipe==0.10.21   # newer releases removed the legacy mp.solutions API used by main_pipeline.py
-requests
-flask
-flask-socketio
-huggingface_hub

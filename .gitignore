@@ -1,4 +1,6 @@
 .venv/
 __pycache__/
 *.pyc
-laptop_vision/models/*.pt
+*.pyo
+models/*.tflite
+logs/
